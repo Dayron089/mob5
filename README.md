@@ -2,67 +2,48 @@
 Группа: Б9123-09.03.03
 
 Выбранный API:
-PokeAPI (https://pokeapi.co/)
-Открытый API, предоставляющий информацию о покемонах.
-В приложении используется для получения списка персонажей, их изображений (спрайтов) и детальной информации (рост, вес, типы).
-API полностью бесплатный и не требует API-ключа для использования.
+PokeAPI (https://pokeapi.co/). Тот же проект, что в ДЗ №4 — список покемонов, детали, избранное и история через Room, DI через Hilt.
 
 
-Что хранится в Room:
+Что сделано в ДЗ №5:
 
-База данных pokemon.db, версия 1, две таблицы.
-
-favorites — избранные покемоны. Запись добавляется при нажатии на сердечко на экране Detail и удаляется при повторном нажатии. Поля: id (PK), name, imageUrl, types (csv), addedAt (millis). После полного перезапуска приложения избранное остаётся.
-
-history — история просмотров. При каждом успешном открытии экрана Detail запись пишется в таблицу через REPLACE по id (обновляется только время последнего просмотра). На экране History список выводится в обратном порядке по времени, есть кнопка очистки.
-
-
-Как проверить (сделал — перезапустил — осталось):
-
-1. Дождаться загрузки списка, открыть любого покемона.
-2. Нажать сердечко на экране Detail (станет красным).
-3. Вернуться, открыть Favorites — он там.
-4. Полностью закрыть приложение (свайпнуть из недавних или adb shell am force-stop com.example.rickandmorty).
-5. Запустить заново. В Favorites запись на месте, в History тоже.
++ Покрыт тестами data-слой и ViewModel — 24 unit-теста (src/test) и 12 инструментальных (src/androidTest).
++ Unit-тесты: PokemonRepositoryTest (кэширование, debounce поиска, сетевые ошибки), MainViewModelTest (состояния List и Detail, реакция на смену query и favorites).
++ Инструментальные: RoomIntegrationTest (FavoritesDao/HistoryDao на in-memory Room), RepositoryRoomIntegrationTest (Repository поверх in-memory БД), PokemonListScreenTest (Compose UI Test через createComposeRule).
++ Fake-реализации PokeApi и DAO в src/test и src/androidTest — не зависим от сети и реальной БД.
 
 
-Чеклист выполненных требований:
+Чеклист требований ТЗ:
 
-Обязательный функционал:
-+ Hilt: DI подключён через @HiltAndroidApp на Application, @AndroidEntryPoint на MainActivity, @HiltViewModel на ViewModel. Зависимости (Retrofit, Repository, AppDatabase, DAO) раздаются модулями NetworkModule и DatabaseModule с @InstallIn(SingletonComponent::class). В UI и ViewModel нет ни одного new или object для создания зависимостей.
-+ Room: 2 таблицы (favorites и history), реально используются — favorites переживает перезапуск, history пишется при каждом открытии Detail.
-+ Приложение из ДЗ №3 остаётся рабочим: 4 экрана через Navigation Compose (List, Detail, Favorites, History), Retrofit + coroutines + viewModelScope, UI состояния Loading / Error+Retry / Empty / Success на List и Loading / Error+Retry / Success на Detail.
-
-Технические требования:
-+ Hilt 2.50
-+ Room 2.6.1 (Entity + DAO + Database, наблюдение через Flow)
-+ Jetpack Compose + Material3
-+ Navigation Compose 2.7.6 (parent-graph scoping для общего ViewModel)
-+ ViewModel + viewModelScope + StateFlow + collectAsStateWithLifecycle
-+ Retrofit + Gson Converter + OkHttp logging
-+ Coil 2.5.0 для картинок
-+ Kotlin 1.9.20, AGP 8.2.0, KSP, compileSdk 34, minSdk 24
-
-Бонусы:
-+ Реализованы оба сценария Room сразу — и Favourites, и History, плюс отдельные экраны под каждый.
-+ Debounce поиска 500мс через Job и delay.
-+ Подключен HttpLoggingInterceptor для отладки сетевых запросов.
-+ Использована библиотека Coil для асинхронной загрузки спрайтов.
-+ Один общий ViewModel на весь NavGraph через hiltViewModel(parentBackStackEntry) — состояние не теряется между переходами.
++ Юнит-тесты для бизнес-логики (Repository + ViewModel) с использованием kotlinx-coroutines-test (runTest, StandardTestDispatcher, MainDispatcherRule).
++ Тесты Flow / StateFlow через Turbine.
++ Инструментальные тесты Room на in-memory builder.
++ Compose UI-тесты через createComposeRule.
++ Базовый проект из ДЗ №4 рабочий, никакой production-код не сломан.
 
 
-Скринщоты:
+Стек тестирования:
 
-01_loading.png — Loading при старте
-02_list.png — список покемонов (Success)
-03_detail.png — Detail с залитым сердечком
-04_favorites.png — Favorites из Room
-05_history.png — History из Room
-06_error.png — Error + Retry (без интернета)
+JUnit 4, kotlinx-coroutines-test, Turbine, Room in-memory builder, Compose UI Test (createComposeRule), Fake DAO/Api.
 
-![Loading](screenshots/01_loading.png)
-![List](screenshots/02_list.png)
-![Detail](screenshots/03_detail.png)
-![Favorites](screenshots/04_favorites.png)
-![History](screenshots/05_history.png)
-![Error](screenshots/06_error.png)
+
+Как запустить:
+
+Юнит-тесты: `./gradlew :app:testDebugUnitTest`
+Инструментальные (нужен эмулятор/устройство): `./gradlew :app:connectedDebugAndroidTest`
+Отчёты: app/build/reports/tests/testDebugUnitTest/index.html и app/build/reports/androidTests/connected/index.html
+
+
+Скриншоты:
+
+Сводка по unit-тестам — 24 теста, 0 failures, 100% successful:
+<img src="screenshots/01_test_summary.png" width="700" alt="Test Summary" />
+
+Терминал — BUILD SUCCESSFUL:
+<img src="screenshots/02_build_successful.png" width="700" alt="Build Successful" />
+
+Тесты по классам — PokemonRepositoryTest (12) + MainViewModelTest (12):
+<img src="screenshots/03_test_classes.png" width="700" alt="Test Classes" />
+
+PokemonRepositoryTest — 12 тестов passed:
+<img src="screenshots/04_repository_tests.png" width="700" alt="Repository Tests" />

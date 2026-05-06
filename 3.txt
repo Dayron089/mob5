@@ -1,0 +1,55 @@
+Домашнее задание 3
+приложение на любом открытом API
+Выбираете любую тему и любой открытый API.
+Примеры тем (не обязательно выбирать отсюда):
+PokeDex (PokeAPI)
+Weather mini (Open-Meteo)
+Space launches (The Space Devs / Launch Library)
+Countries explorer (REST Countries)
+Star Wars explorer (SWAPI)
+Public holidays (Nager.Date)
+Universities explorer (universities.hipolabs)
+Главное: API должен позволять сделать список + детали (или “поиск + детали”).
+Обязательный функционал (минимум для зачёта)
+A) Навигация
+Минимум 2 экрана:
+1. List/Search - список результатов (и поиск/фильтр)
+2. Detail/{id} - детали элемента по аргументу в route
+B) Архитектура
+UiState
+ViewModel
+UI-экраны максимально stateless: получают state + callbacks ( onEvent)
+Repository между ViewModel и Retrofit
+C) Coroutines + Retrofit
+Все сетевые запросы - через suspend функции Retrofit
+Запуск из viewModelScope
+D) UI состояния
+Loading (показываем индикатор/текст)
+Error (сообщение + кнопка Retry)
+Empty (если ничего не найдено)
+Success (список)
+E) Избранное (локально, без БД)
+Можно добавлять/убирать элемент в favourites
+Избранное должно переживать:
+поворот экрана (т.е. хранить в ViewModel state)
+Технические требования
+Compose + Material3
+Navigation Compose
+ViewModel + viewModelScope
+Retrofit + конвертер (Gson или kotlinx.serialization)
+Без Flow (можно, но не требуется)
+Бонусы (выберите 1–3, если хотите баллы сверху)
+Debounce поиска без Flow: Job + delay(300–500ms) и отмена
+Экран Favourites как отдельный route
+“Pull to refresh” / кнопка Refresh
+Кэш последнего результата в памяти
+Логирование запросов (OkHttp logging)
+Пагинация (если API поддерживает) - даже простая “Load more”
+Что сдавать
+1. PR на рабочий проект
+2. README:
+ФИО, группа
+какой API выбрали (название + коротко что он даёт)
+как запустить (если нужен ключ - как добавить, но лучше выбирать API без ключа)
+3–5 скриншотов (Loading / Error / List / Detail / Favourites)
+чеклист: что из обязательного сделали + какие бонусы
